@@ -13,3 +13,10 @@ def progress(count, total, suffix=''):
 
     sys.stderr.write('[%s] %s%s ...%s\r' % (bar, percents, '%', suffix))
     sys.stdout.flush
+
+def tour_length(points, solution):
+    # calculate the length of the tour
+    tour_length = distance(points[solution[-1]], points[solution[0]])
+    for index in range(0, len(points)-1):
+        tour_length += distance(points[solution[index]], points[solution[index+1]])
+    return tour_length
