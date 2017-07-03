@@ -18,15 +18,33 @@ def find_point_by_index(next_point, points):
         if point.index == next_point:
             return index
 
-def plot_points(points):
+def plot_points(points, solution):
+    ax = plt.axes()
+    area = 100
     for point in points:
-        plt.scatter(point.x, point.y, alpha=0.5)
+        plt.scatter(point.x, point.y, s=area, alpha=0.5)
+    # ax.arrow(0, 0, 0, 0.5)
+    # ax.arrow(0, 0.5, 0, 1)
+    for index in range(0, len(points)-1):
+        # obj += distance(points[solution[index]], points[solution[index+1]])
+        x = points[solution[index]].x
+        y = points[solution[index]].y
+        dx = points[solution[index+1]].x - points[solution[index]].x
+        dy = points[solution[index+1]].y - points[solution[index]].y
+        ax.arrow(x, y, dx, dy, head_width=0.05, head_length=0.01, fc='k', ec='k')
     plt.show()
+
+def improve_greedy(points, solution):
+    for i in range(1, len(solution)):
+        for j in range(0, len(solution)-1):
+            new_s = solution[:j] + solution[j:j+i+1][::-1] + solution[j+i+1:]
+            print(new_s)
+    return solution, points
 
 def greedy_solver(points):
     new_points = []
     old_points = copy.deepcopy(points)
-    next_point = 0#np.random.randint(0, len(points))
+    next_point = np.random.randint(0, len(points))
     current_point = old_points.pop(next_point)
     new_points.append(current_point)
     counter = 0
@@ -45,14 +63,18 @@ def greedy_solver(points):
         # print(distances)
     print('')
 
-    plot_points(points)
-
     solution = []
     for point in new_points:
         solution.append(point.index)
 
+    plot_points(points, solution)
+
     return solution, points
 
+def solver(points):
+    solution, points = greedy_solver(points)
+    solution, points = improve_greedy(points, solution)
+    return solution, points
 
 def trivial_solver(points):
     node_count = len(points)
