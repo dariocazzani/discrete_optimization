@@ -26,6 +26,7 @@ def solve_it(input_data):
     # build a trivial solution
     # visit the nodes in the order they appear in the file
     solution, points = greedy_solver(points)
+    # solution, points = trivial_solver(points)
 
     # calculate the length of the tour
     obj = distance(points[solution[-1]], points[solution[0]])
