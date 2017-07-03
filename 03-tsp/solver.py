@@ -3,8 +3,8 @@
 
 from collections import namedtuple
 
-from algos import trivial_solver, greedy_solver
-from utils import distance
+from algos import trivial_solver, solver
+from utils import distance, tour_length
 
 Point = namedtuple("Point", ['index', 'x', 'y'])
 
@@ -25,13 +25,11 @@ def solve_it(input_data):
     # print(points)
     # build a trivial solution
     # visit the nodes in the order they appear in the file
-    solution, points = greedy_solver(points)
+    solution, points = solver(points)
     # solution, points = trivial_solver(points)
 
     # calculate the length of the tour
-    obj = distance(points[solution[-1]], points[solution[0]])
-    for index in range(0, node_count-1):
-        obj += distance(points[solution[index]], points[solution[index+1]])
+    obj = tour_length(points, solution)
 
     # prepare the solution in the specified output format
     output_data = '%.2f' % obj + ' ' + str(0) + '\n'
