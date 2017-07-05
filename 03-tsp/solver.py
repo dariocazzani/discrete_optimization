@@ -4,7 +4,7 @@
 from collections import namedtuple
 
 from algos import trivial_solver, solver
-from utils import distance, tour_length
+from utils import tour_length
 
 Point = namedtuple("Point", ['index', 'x', 'y'])
 
