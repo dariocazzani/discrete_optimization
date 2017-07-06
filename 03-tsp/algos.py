@@ -10,8 +10,8 @@ import random
 
 def find_log_patience(x):
 	# define static point where the curve passes through
-	y1 = 2
-	y2 = 1000
+	y1 = 50
+	y2 = 10000
 	x1 = 51
 	x2 = 33800
 	a = (y1-y2) / np.log(x1 / x2)
@@ -169,7 +169,9 @@ def solver(points):
 	no_improvements_count = 0
 	print('Tour length before improvement": {}'.format(best_tour_length))
 
-	for i in range(3):
+	i = 0
+	while(i < 3):
+		i+=1
 		solution, points = improve_greedy_3OPT(points, solution)
 		solution, points = improve_greedy_2OPT(points, solution)
 		current_tour_length = tour_length(points, solution)
@@ -186,6 +188,9 @@ def solver(points):
 			p1, p2 = random.sample(range(0, len(points)), 2)
 			solution[p1], solution[p2] = solution[p2], solution[p1]
 			print('After swap, tour length: {}'.format(tour_length(points, solution)))
+		if len(points) == 51 and best_tour_length > 430:
+			print('{} is still not good enough, keep on trying'.format(best_tour_length))
+			i = 0
 
 	best_tour_length = tour_length(points, best_solution)
 	print('Best tour length after improvement 2 and 3-OPT": {}'.format(best_tour_length))
