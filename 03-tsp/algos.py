@@ -191,6 +191,9 @@ def solver(points):
 		if len(points) == 51 and best_tour_length > 430:
 			print('{} is still not good enough, keep on trying'.format(best_tour_length))
 			i = 0
+		if len(points) == 100 and best_tour_length > 20800:
+			print('{} is still not good enough, keep on trying'.format(best_tour_length))
+			i = 0
 
 	best_tour_length = tour_length(points, best_solution)
 	print('Best tour length after improvement 2 and 3-OPT": {}'.format(best_tour_length))
