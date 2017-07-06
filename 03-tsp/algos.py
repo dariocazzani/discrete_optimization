@@ -161,14 +161,18 @@ def solver(points):
 			solution[p1], solution[p2] = solution[p2], solution[p1]
 			# print('After swap, tour length: {}'.format(tour_length(points, solution)))
 
-		if len(points) == 51 and best_tour_length < 430:
-			done = True
+		if len(points) == 51:
+			if best_tour_length < 430:
+				done = True
 
-		if len(points) == 100 and best_tour_length > 20800:
-			done = True
+		elif len(points) == 100:
+			if best_tour_length > 20800:
+				done = True
 
-		elif counter >= 3:
-			done = True
+		else:
+			if counter >= 3:
+				done = True
+
 
 	best_tour_length = tour_length(points, best_solution)
 	print('Best tour length after improvement 2 and 3-OPT": {}'.format(best_tour_length))
