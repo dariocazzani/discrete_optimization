@@ -7,11 +7,12 @@ import operator
 import matplotlib.pyplot as plt
 import time
 import random
+from multiprocessing import Process, Queue
 
 def find_log_patience(x):
 	# define static point where the curve passes through
-	y1 = 50
-	y2 = 10000
+	y1 = 2
+	y2 = 1000
 	x1 = 51
 	x2 = 33800
 	a = (y1-y2) / np.log(x1 / x2)
@@ -64,7 +65,7 @@ def improve_greedy_2OPT(points, solution):
 				solution = copy.deepcopy(new_s)
 				# print('New solution with length: {}'.format(best_tour_length))
 				# done = True
-				print('stopping at this solution {}'.format(best_tour_length))
+				# print('stopping at this solution {}'.format(best_tour_length))
 			if time.time() - start > MAX_PATIENCE:
 				done = True
 	except KeyboardInterrupt:
@@ -95,7 +96,7 @@ def improve_greedy_3OPT(points, solution):
 				solution.insert(position2, solution.pop(position1))
 			if time.time() - start > MAX_PATIENCE:
 				done = True
-				print('stopping at this solution {}'.format(best_tour_length))
+				# print('stopping at this solution {}'.format(best_tour_length))
 	except KeyboardInterrupt:
 		print('stopping at this solution {}'.format(best_tour_length))
 
@@ -129,36 +130,6 @@ def greedy_solver(points):
 
 	return solution, points
 
-def swap(points, solution):
-	print('*** swap ***')
-	best_tour_length = tour_length(points, solution)
-	MAX_PATIENCE = 10
-	done = False
-	start = time.time()
-	try:
-		# swap
-		while not done:
-			position1, position2 = random.sample(range(0, len(points)), 2)
-			# swap 2 nodes
-			solution[position1], solution[position2] = solution[position2], solution[position1]
-			current_tour_length = tour_length(points, solution)
-			if current_tour_length < best_tour_length:
-				best_tour_length = current_tour_length
-				print('New solution with length: {}'.format(best_tour_length))
-				done = True
-			else:
-				# swap back
-				solution[position1], solution[position2] = solution[position2], solution[position1]
-			if time.time() - start > MAX_PATIENCE:
-				for _ in range(10):
-					position1, position2 = random.sample(range(0, len(points)), 2)
-					solution[position1], solution[position2] = solution[position2], solution[position1]
-				done = True
-	except KeyboardInterrupt:
-		print('stopping at this solution {}'.format(best_tour_length))
-
-	return solution, points
-
 def solver(points):
 	print('number of points: {}'.format(len(points)))
 	solution, points = greedy_solver(points)
@@ -169,9 +140,10 @@ def solver(points):
 	no_improvements_count = 0
 	print('Tour length before improvement": {}'.format(best_tour_length))
 
-	i = 0
-	while(i < 3):
-		i+=1
+	done = False
+	counter = 0
+	while not done:
+		counter+=1
 		solution, points = improve_greedy_3OPT(points, solution)
 		solution, points = improve_greedy_2OPT(points, solution)
 		current_tour_length = tour_length(points, solution)
@@ -184,21 +156,62 @@ def solver(points):
 			no_improvements_count += 1
 
 		if no_improvements_count % 2 ==0 :
-			print('** swap **')
+			# print('** swap **')
 			p1, p2 = random.sample(range(0, len(points)), 2)
 			solution[p1], solution[p2] = solution[p2], solution[p1]
-			print('After swap, tour length: {}'.format(tour_length(points, solution)))
-		if len(points) == 51 and best_tour_length > 430:
-			print('{} is still not good enough, keep on trying'.format(best_tour_length))
-			i = 0
+			# print('After swap, tour length: {}'.format(tour_length(points, solution)))
+
+		if len(points) == 51 and best_tour_length < 430:
+			done = True
+
 		if len(points) == 100 and best_tour_length > 20800:
-			print('{} is still not good enough, keep on trying'.format(best_tour_length))
-			i = 0
+			done = True
+
+		elif counter >= 3:
+			done = True
 
 	best_tour_length = tour_length(points, best_solution)
 	print('Best tour length after improvement 2 and 3-OPT": {}'.format(best_tour_length))
 	# plot_points(points, solution)
 	return best_solution, points
+
+def solver_caller(points, q):
+	best_solution, points = solver(points)
+	q.put(best_solution)
+
+
+def parallel_solver(points):
+	q = Queue()
+	num_processes = 8
+	jobs = []
+	for _ in range(num_processes):
+		p = Process(target=solver_caller, args=(points, q))
+		jobs.append(p)
+		time.sleep(np.random.rand()*2)
+		p.start()
+
+	first_best_solution = q.get()
+	first_best_tour_length = tour_length(points, first_best_solution)
+
+	wait_for_all = False
+	# If this is True, it will wait for all processes and select the best solution
+	# Otherwise it will take the first good solution from the process that finishes first
+	if wait_for_all:
+		for job in jobs:
+			job.join()
+		while not q.empty():
+			process_solution = q.get()
+			process_tour_length = tour_length(points, process_solution)
+			if process_tour_length < first_best_tour_length:
+				first_best_tour_length = process_tour_length
+				first_best_solution = copy.deepcopy(process_solution)
+
+	for job in jobs:
+		job.terminate()
+	print('first element in queue{}'.format(first_best_solution))
+	print('first best tour length {}'.format(first_best_tour_length))
+
+	return first_best_solution, points
 
 def trivial_solver(points):
 	node_count = len(points)
