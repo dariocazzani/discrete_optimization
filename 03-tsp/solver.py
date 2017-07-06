@@ -3,7 +3,7 @@
 
 from collections import namedtuple
 
-from algos import trivial_solver, solver
+from algos import trivial_solver, solver, parallel_solver
 from utils import tour_length
 
 Point = namedtuple("Point", ['index', 'x', 'y'])
@@ -25,7 +25,7 @@ def solve_it(input_data):
     # print(points)
     # build a trivial solution
     # visit the nodes in the order they appear in the file
-    solution, points = solver(points)
+    solution, points = parallel_solver(points)
     # solution, points = trivial_solver(points)
 
     # calculate the length of the tour
