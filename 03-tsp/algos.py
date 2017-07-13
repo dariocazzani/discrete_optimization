@@ -175,14 +175,19 @@ def solver(points):
 			if best_tour_length < 30000:
 				done = True
 
-		# 6
-		elif len(points) == 33810:
-			if best_tour_length < 78478868:
+		# 4
+		elif len(points) == 574:
+			if best_tour_length < 39250:
 				done = True
 
 		# 5
 		elif len(points) == 1889:
-			if best_tour_length < 323000:
+			if best_tour_length < 374998:#323000:
+				done = True
+
+		# 6
+		elif len(points) == 33810:
+			if best_tour_length < 78478868:
 				done = True
 
 
