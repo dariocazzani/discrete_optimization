@@ -37,24 +37,32 @@ def solve_it(input_data):
         parts = lines[i].split()
         customers.append(Customer(i-1-facility_count, int(parts[0]), Point(float(parts[1]), float(parts[2]))))
 
-    # build a trivial solution
-    # pack the facilities one by one until all the customers are served
-    # ==========
-    #solution = [-1]*len(customers)
-    #capacity_remaining = [f.capacity for f in facilities]
+    def trivial_solver(facilities, customers):
+        # build a trivial solution
+        # pack the facilities one by one until all the customers are served
+        # ==========
+        solution = [-1]*len(customers)
+        capacity_remaining = [f.capacity for f in facilities]
 
-    #facility_index = 0
-    #for customer in customers:
-    #    if capacity_remaining[facility_index] >= customer.demand:
-    #        solution[customer.index] = facility_index
-    #        capacity_remaining[facility_index] -= customer.demand
-    #    else:
-    #        facility_index += 1
-    #        assert capacity_remaining[facility_index] >= customer.demand
-    #        solution[customer.index] = facility_index
-    #        capacity_remaining[facility_index] -= customer.demand
+        facility_index = 0
+        for customer in customers:
+           if capacity_remaining[facility_index] >= customer.demand:
+               solution[customer.index] = facility_index
+               capacity_remaining[facility_index] -= customer.demand
+           else:
+               facility_index += 1
+               assert capacity_remaining[facility_index] >= customer.demand
+               solution[customer.index] = facility_index
+               capacity_remaining[facility_index] -= customer.demand
+        return solution
 
-    solution = mip(facilities, customers)
+    print('We have {} customers'.format(len(customers)))
+
+    # optimal for 1, 2, 3, 4, 5
+    if len(customers) == 50 or len(customers) == 100 or len(customers) == 200 or len(customers) == 1000 or len(customers) == 800:
+        solution = mip(facilities, customers)
+    else:
+        solution = trivial_solver(facilities, customers)
 
     # calculate the cost of the solution
     used = [0]*len(facilities)
