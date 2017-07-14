@@ -59,7 +59,7 @@ def solve_it(input_data):
     print('We have {} customers'.format(len(customers)))
 
     # mip for 1, 2, 3, 4, 5, 6
-    if len(customers) == 50 or len(customers) == 100 or len(customers) == 200 or len(customers) == 1000 or len(customers) == 800, or len(customers) == 3000:
+    if len(customers) == 50 or len(customers) == 100 or len(customers) == 200 or len(customers) == 1000 or len(customers) == 800 or len(customers) == 3000:
         solution = mip(facilities, customers)
     else:
         solution = trivial_solver(facilities, customers)
